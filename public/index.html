@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Node.js App</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f4f5f7;
+      color: #1a1a1a;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    .shell { max-width: 860px; margin: 0 auto; }
+
+    /* ── Header ─────────────────────────────────────────────── */
+    header { margin-bottom: 2rem; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      background: #dcfce7;
+      color: #166534;
+      margin-bottom: 12px;
+    }
+    .badge .dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #16a34a;
+    }
+    h1 { font-size: 26px; font-weight: 600; margin-bottom: 4px; }
+    .subtitle { font-size: 14px; color: #6b7280; }
+
+    /* ── Metrics ─────────────────────────────────────────────── */
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      margin-bottom: 2rem;
+    }
+    .metric {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+    }
+    .metric-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 6px;
+    }
+    .metric-value { font-size: 28px; font-weight: 700; color: #111827; }
+    .metric-value.sm { font-size: 17px; padding-top: 5px; font-weight: 600; }
+
+    /* ── Section title ───────────────────────────────────────── */
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      margin-bottom: 10px;
+      margin-top: 2rem;
+    }
+
+    /* ── Endpoint list ───────────────────────────────────────── */
+    .endpoints { display: flex; flex-direction: column; gap: 8px; }
+    .ep {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 16px;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+    }
+    .method {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 5px;
+      min-width: 46px;
+      text-align: center;
+      font-family: 'Courier New', monospace;
+      letter-spacing: .02em;
+    }
+    .get  { background: #dbeafe; color: #1e40af; }
+    .post { background: #dcfce7; color: #166534; }
+    .ep-path  { font-family: 'Courier New', monospace; font-size: 14px; flex: 1; color: #374151; }
+    .ep-desc  { font-size: 13px; color: #9ca3af; }
+
+    /* ── Users card ──────────────────────────────────────────── */
+    .card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-top: 10px;
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead th {
+      text-align: left;
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    tbody td { padding: 11px 12px; border-bottom: 1px solid #f9fafb; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #f9fafb; }
+
+    .avatar {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: #dbeafe;
+      color: #1e40af;
+      font-size: 11px;
+      font-weight: 700;
+      margin-right: 9px;
+      vertical-align: middle;
+    }
+
+    /* ── Add user form ───────────────────────────────────────── */
+    .add-form {
+      display: flex;
+      gap: 8px;
+      margin-top: 1.25rem;
+      flex-wrap: wrap;
+      padding-top: 1rem;
+      border-top: 1px solid #f3f4f6;
+    }
+    .add-form input {
+      flex: 1;
+      min-width: 140px;
+      padding: 9px 13px;
+      font-size: 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      outline: none;
+      color: #111827;
+      background: #fff;
+      transition: border-color .15s;
+    }
+    .add-form input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,.12); }
+    .add-form input::placeholder { color: #9ca3af; }
+    .add-form button {
+      padding: 9px 18px;
+      background: #4f46e5;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s, transform .1s;
+      white-space: nowrap;
+    }
+    .add-form button:hover  { background: #4338ca; }
+    .add-form button:active { transform: scale(.97); }
+
+    /* ── Status bar ──────────────────────────────────────────── */
+    .status-bar {
+      margin-top: 12px;
+      padding: 10px 14px;
+      background: #f9fafb;
+      border-radius: 8px;
+      font-size: 13px;
+      color: #6b7280;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .status-bar.success { background: #f0fdf4; color: #166534; }
+    .status-bar.error   { background: #fef2f2; color: #991b1b; }
+
+    /* ── Footer ──────────────────────────────────────────────── */
+    footer {
+      margin-top: 3rem;
+      text-align: center;
+      font-size: 12px;
+      color: #d1d5db;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+
+    <header>
+      <div class="badge">
+        <span class="dot"></span>
+        Server running · port 3000
+      </div>
+      <h1>My Node.js App on Deployed using CI CD Pipeline</h1>
+      <p class="subtitle">Express REST API — live dashboard</p>
+    </header>
+
+    <!-- Metrics -->
+    <div class="metrics">
+      <div class="metric">
+        <div class="metric-label">Total users</div>
+        <div class="metric-value" id="userCount">—</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Endpoints</div>
+        <div class="metric-value">4</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Environment</div>
+        <div class="metric-value sm" id="env">—</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Version</div>
+        <div class="metric-value sm" id="version">—</div>
+      </div>
+    </div>
+
+    <!-- Endpoints -->
+    <p class="section-title">API endpoints</p>
+    <div class="endpoints">
+      <div class="ep"><span class="method get">GET</span><span class="ep-path">/</span><span class="ep-desc">Welcome message</span></div>
+      <div class="ep"><span class="method get">GET</span><span class="ep-path">/health</span><span class="ep-desc">Health check</span></div>
+      <div class="ep"><span class="method get">GET</span><span class="ep-path">/users</span><span class="ep-desc">List all users</span></div>
+      <div class="ep"><span class="method post">POST</span><span class="ep-path">/users</span><span class="ep-desc">Create a user</span></div>
+    </div>
+
+    <!-- Users table -->
+    <p class="section-title">Users</p>
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>ID</th>
+          </tr>
+        </thead>
+        <tbody id="userTable">
+          <tr><td colspan="3" style="color:#9ca3af;text-align:center;padding:1.5rem">Loading…</td></tr>
+        </tbody>
+      </table>
+
+      <div class="add-form">
+        <input id="newName"  type="text"  placeholder="Full name" />
+        <input id="newEmail" type="email" placeholder="Email address" />
+        <button onclick="addUser()">+ Add user</button>
+      </div>
+
+      <div class="status-bar" id="statusBar">
+        ℹ Fill in name and email above to add a new user
+      </div>
+    </div>
+
+    <footer>my-node-app v1.0.0 · Express + Node.js</footer>
+  </div>
+
+  <script>
+    function initials(name) {
+      return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+    }
+
+    // Load health info
+    fetch('/health')
+      .then(r => r.json())
+      .then(d => {
+        document.getElementById('version').textContent = d.version || '1.0.0';
+        document.getElementById('env').textContent = 'production';
+      })
+      .catch(() => {
+        document.getElementById('version').textContent = '1.0.0';
+        document.getElementById('env').textContent = 'development';
+      });
+
+    // Load users
+    function loadUsers() {
+      fetch('/users')
+        .then(r => r.json())
+        .then(d => {
+          document.getElementById('userCount').textContent = d.total;
+          const rows = d.users.map(u => `
+            <tr>
+              <td><span class="avatar">${initials(u.name)}</span>${u.name}</td>
+              <td>${u.email}</td>
+              <td>#${u.id}</td>
+            </tr>
+          `).join('');
+          document.getElementById('userTable').innerHTML = rows;
+        })
+        .catch(() => {
+          document.getElementById('userCount').textContent = '?';
+          document.getElementById('userTable').innerHTML =
+            '<tr><td colspan="3" style="color:#9ca3af;text-align:center;padding:1.5rem">Could not reach API</td></tr>';
+        });
+    }
+
+    // Add user
+    function addUser() {
+      const name  = document.getElementById('newName').value.trim();
+      const email = document.getElementById('newEmail').value.trim();
+      const bar   = document.getElementById('statusBar');
+
+      if (!name || !email) {
+        bar.className = 'status-bar error';
+        bar.textContent = '✕ Both name and email are required';
+        return;
+      }
+
+      fetch('/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email })
+      })
+        .then(r => r.json())
+        .then(d => {
+          bar.className = 'status-bar success';
+          bar.textContent = `✓ User "${d.user.name}" created successfully`;
+          document.getElementById('newName').value  = '';
+          document.getElementById('newEmail').value = '';
+          loadUsers();
+        })
+        .catch(() => {
+          bar.className = 'status-bar error';
+          bar.textContent = '✕ Failed to create user — is the server running?';
+        });
+    }
+
+    loadUsers();
+  </script>
+</body>
+</html>
